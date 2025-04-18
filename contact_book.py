@@ -24,30 +24,25 @@ class Record:
         self.phones = []
 
     def add_phone(self, phone):
-        try:
-            self.phones.append(Phone(phone))  
-        except ValueError as e:
-            print(f"Error adding phone: {e}")
+        self.phones.append(Phone(phone))
 
 
     def edit_phone(self, old_phone, new_phone):
         for phone in self.phones:
             if phone.value == old_phone:
-                phone.value = new_phone
-                return f"Phone number updated: {str(self)}"
-        return f"Phone number '{old_phone}' not found in {self.name.value}'s record."
+                phone.value = Phone(new_phone).value
+        raise ValueError(f"Phone number '{old_phone}' not found.")
     
     def find_phone(self, phone_number):
         for phone in self.phones:
             if phone.value == phone_number:
-                return f"Phone number {phone_number} found in {self.name.value}'s record."
-        return f"Phone number {phone_number} not found in {self.name.value}'s record."
+                return phone
+        return None
     
     def remove_phone(self, phone_number):
         for phone in self.phones:
             if phone.value == phone_number:
                 self.phones.remove(phone)
-                return "Видалено успішно"
         raise ValueError(f"Phone number '{phone_number}' not found.")
     
     def __str__(self):
@@ -59,17 +54,13 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def find(self, name):
-        if name in self.data:
-            return self.data[name]
-        else:
-            return f"Record with name '{name}' not found."
+        return self.data.get(name, None)
         
     def delete(self, name):
         if name in self.data:
             del self.data[name]
-            return f"Record with name '{name}' has been deleted."
         else:
-            return f"Record with name '{name}' not found."
+            raise KeyError(f"Record with name '{name}' not found.")
 
     def __str__(self):
         result = ""
@@ -77,26 +68,3 @@ class AddressBook(UserDict):
             result += str(record) + "\n"
         return result.strip()
     
-    
-book = AddressBook()
-
-john_record = Record("John")
-john_record.add_phone("1234567890")
-john_record.add_phone("5555555555")
-book.add_record(john_record)
-
-jane_record = Record("Jane")
-jane_record.add_phone("9876543210")
-book.add_record(jane_record)
-
-print(book)
-
-john = book.find("John")
-john.edit_phone("1234567890", "1112223333")
-
-found_phone = john.find_phone("5555555555")
-print(f"{john.name}: {found_phone}")  
-
-book.delete("Jane")
-
-print(book)
